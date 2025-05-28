@@ -18,10 +18,19 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.ModalBottomSheetDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -32,6 +41,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.lerp
 import androidx.compose.ui.unit.sp
@@ -39,6 +49,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.zippyfeed.R
+import com.example.zippyfeed.ui.BasicDialog
 import com.example.zippyfeed.ui.GroupSocialButtons
 import com.example.zippyfeed.ui.features.auth.signup.SignUpViewModel
 import com.example.zippyfeed.ui.navigation.Home
@@ -47,17 +58,26 @@ import com.example.zippyfeed.ui.navigation.SignUp
 import com.example.zippyfeed.ui.theme.Orange
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
 fun AuthScreen(navController : NavController,viewModel: AuthScreenViewModel = hiltViewModel()) {
+
+    val imageSize = remember{
+        mutableStateOf(IntSize.Zero)
+    }
+    val sheetState = rememberModalBottomSheetState()
+    val scope = rememberCoroutineScope()
+    var showDialog by remember { mutableStateOf(false) }
 
     val brush = Brush.verticalGradient(
         colors = listOf(
             Color.Transparent,
             Color.Black
         ),
-        startY = 300f
+        startY = imageSize.value.height.toFloat()/3
     )
 
     LaunchedEffect(true) {
@@ -72,6 +92,9 @@ fun AuthScreen(navController : NavController,viewModel: AuthScreenViewModel = hi
                 }
                 is AuthScreenViewModel.AuthInNavigationEvent.NavigationToSignUp -> {
                     navController.navigate(SignUp)
+                }
+                is AuthScreenViewModel.AuthInNavigationEvent.ShowErrorDialog->{
+                    showDialog = true
                 }
             }
 
@@ -171,6 +194,24 @@ fun AuthScreen(navController : NavController,viewModel: AuthScreenViewModel = hi
             }
         }
     }
+    if (showDialog) {
+        ModalBottomSheet(
+            onDismissRequest = { showDialog = false },
+            sheetState = sheetState
+        ) {
+            BasicDialog(
+                title = viewModel.error,
+                description = viewModel.errorDescription,
+                onClick = {
+                    scope.launch {
+                        sheetState.hide()
+                        showDialog = false
+                    }
+                }
+            )
+        }
+    }
+
 }
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)

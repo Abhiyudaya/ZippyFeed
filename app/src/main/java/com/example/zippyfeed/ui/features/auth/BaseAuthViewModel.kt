@@ -1,7 +1,6 @@
 package com.example.zippyfeed.ui.features.auth
 
 import android.os.Build
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.annotation.RequiresApi
 import androidx.credentials.CredentialManager
@@ -9,7 +8,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.zippyfeed.data.FoodApi
 import com.example.zippyfeed.data.auth.GoogleAuthUiProvider
-import com.example.zippyfeed.data.models.AuthResponse
 import com.example.zippyfeed.data.models.OAuthRequest
 import com.example.zippyfeed.data.remote.ApiResponse
 import com.example.zippyfeed.data.remote.safeApiCall
@@ -21,6 +19,9 @@ import com.facebook.login.LoginResult
 import kotlinx.coroutines.launch
 
 abstract class BaseAuthViewModel(open val foodApi: FoodApi) : ViewModel() {
+
+    var error : String = ""
+    var errorDescription: String = ""
 
     private val googleAuthUiProvider = GoogleAuthUiProvider()
     private lateinit var callbackManager: CallbackManager
