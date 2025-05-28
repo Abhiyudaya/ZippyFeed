@@ -1,0 +1,22 @@
+<resources>
+    <string name="app_name">ZippyFeed</string>
+    <string name="skip">Skip</string>
+    <string name="welcome">Welcome to\n</string>
+    <string name="zippy_feed_description">Your favourite foods delivered fast at your door.</string>
+    <string name="already_have_account">Already have an account ? Login</string>
+    <string name="dont_have_account">Don\'t have an account ? SignUp</string>
+    <string name="sign_with_email">Sign in with email\n</string>
+    <string name="sign_with_google">Google</string>
+    <string name="sign_with_facebook">Facebook</string>
+    <string name="sign_in_title">Sign In</string>
+    <string name="sign_in_with">Sign In with</string>
+    <string name="sign_up">Sign Up\n</string>
+    <string name="sign_in">Sign In\n</string>
+    <string name="password">Password</string>
+    <string name="email">E-Mail</string>
+    <string name="full_name">Full Name</string>
+
+    <string name="facebook_app_id">522469577568892</string>
+    <string name="fb_login_protocol_scheme">fb1234</string>
+    <string name="facebook_client_token">3c6f4cc15a76e3bf2d089f498feb4450</string>
+</resources>
