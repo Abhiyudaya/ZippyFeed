@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.zippyfeed.ZippyFeedApp
 import com.example.zippyfeed.data.FoodApi
+import com.example.zippyfeed.data.ZippyFeedSession
 import com.example.zippyfeed.data.models.SignUpRequest
 import com.example.zippyfeed.data.remote.ApiResponse
 import com.example.zippyfeed.data.remote.safeApiCall
@@ -24,7 +25,8 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class SignUpViewModel @Inject constructor(override val foodApi: FoodApi) : BaseAuthViewModel(foodApi) {
+class SignUpViewModel @Inject constructor(override val foodApi: FoodApi, val session : ZippyFeedSession) :
+    BaseAuthViewModel(foodApi) {
     private val _uiState = MutableStateFlow<SignUpEvent>(SignUpEvent.Nothing)
     val uiState = _uiState.asStateFlow()
 
@@ -68,6 +70,7 @@ class SignUpViewModel @Inject constructor(override val foodApi: FoodApi) : BaseA
                 when (response) {
                     is ApiResponse.Success -> {
                         _uiState.value = SignUpEvent.Success
+                        session.storeToken(response.data.token)
                         _navigationEvent.emit(SignUpNavigationEvent.NavigationToHome)
                     }
                     else -> {
@@ -127,6 +130,7 @@ class SignUpViewModel @Inject constructor(override val foodApi: FoodApi) : BaseA
 
     override fun onSocialLoginSuccess(token: String) {
         viewModelScope.launch {
+            session.storeToken(token)
             _uiState.value = SignUpEvent.Success
             _navigationEvent.emit(SignUpNavigationEvent.NavigationToHome)
         }

@@ -3,6 +3,7 @@ package com.example.zippyfeed.ui.features.auth
 import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.example.zippyfeed.data.FoodApi
+import com.example.zippyfeed.data.ZippyFeedSession
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -12,8 +13,8 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class AuthScreenViewModel @Inject constructor(override val foodApi: FoodApi) : BaseAuthViewModel(foodApi) {
-
+class AuthScreenViewModel @Inject constructor(override val foodApi: FoodApi, val session: ZippyFeedSession) :
+    BaseAuthViewModel(foodApi) {
 
     private val _uiState = MutableStateFlow<AuthEvent>(AuthEvent.Nothing)
     val uiState = _uiState.asStateFlow()
@@ -64,6 +65,7 @@ class AuthScreenViewModel @Inject constructor(override val foodApi: FoodApi) : B
     override fun onSocialLoginSuccess(token: String) {
         viewModelScope.launch {
             _uiState.value = AuthEvent.Success
+            session.storeToken(token)
             _navigationEvent.emit(AuthInNavigationEvent.NavigationToHome)
         }
     }

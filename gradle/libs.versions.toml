@@ -7,6 +7,7 @@ googleid = "1.1.1"
 hiltAndroidCompiler = "2.51.1"
 hiltNavigationCompose = "1.2.0"
 kotlin = "1.9.0"
+ksp = "1.9.0-1.0.13"
 coreKtx = "1.15.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
@@ -20,6 +21,8 @@ loggingInterceptor = "4.12.0"
 navigationCompose = "2.8.5"
 navigationComposeVersion = "2.8.6"
 retrofit = "2.11.0"
+animationCompose = "1.7.6"
+foundationCompose = "1.7.6"
 
 [libraries]
 accompanist-systemuicontroller = { module = "com.google.accompanist:accompanist-systemuicontroller", version.ref = "accompanistSystemuicontroller" }
@@ -51,8 +54,11 @@ core-splashscreen = {module = "androidx.core:core-splashscreen",version.ref = "c
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 logging-interceptor = { module = "com.squareup.okhttp3:logging-interceptor", version.ref = "loggingInterceptor" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
+androidx-animation = { group = "androidx.compose.animation", name = "animation", version.ref="animationCompose" }
+androidx-foundation = { group = "androidx.compose.foundation", name = "foundation", version.ref="foundationCompose" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 

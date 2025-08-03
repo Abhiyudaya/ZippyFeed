@@ -11,6 +11,8 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -29,13 +31,18 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
 import com.example.zippyfeed.data.FoodApi
+import com.example.zippyfeed.data.ZippyFeedSession
 import com.example.zippyfeed.ui.features.auth.AuthScreen
 import com.example.zippyfeed.ui.features.auth.login.SignInScreen
 import com.example.zippyfeed.ui.features.auth.signup.SignUpScreen
+import com.example.zippyfeed.ui.features.home.HomeScreen
+import com.example.zippyfeed.ui.features.restaurant_details.RestaurantDetailsScreen
 import com.example.zippyfeed.ui.navigation.AuthScreen
 import com.example.zippyfeed.ui.navigation.Home
 import com.example.zippyfeed.ui.navigation.Login
+import com.example.zippyfeed.ui.navigation.RestaurantDetails
 import com.example.zippyfeed.ui.navigation.SignUp
 import com.example.zippyfeed.ui.theme.ZippyFeedTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -51,6 +58,11 @@ class MainActivity : ComponentActivity() {
 
     @Inject
     lateinit var foodApi: FoodApi
+    @Inject
+    lateinit var session: ZippyFeedSession
+
+
+    @OptIn(ExperimentalSharedTransitionApi::class)
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen().apply {
@@ -90,75 +102,83 @@ class MainActivity : ComponentActivity() {
         setContent {
             ZippyFeedTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+
                     val navController = rememberNavController()
-                    NavHost(
-                        navController = navController,
-                        startDestination = AuthScreen,
-                        modifier = Modifier.padding(innerPadding),
-                        enterTransition = {
-                            slideIntoContainer(
-                                towards = AnimatedContentTransitionScope.SlideDirection.Left,
-                                animationSpec = tween(300)
-                            ) + fadeIn(animationSpec = tween(300))
-                        },
-                        exitTransition = {
-                            slideOutOfContainer(
-                                towards = AnimatedContentTransitionScope.SlideDirection.Left,
-                                animationSpec = tween(300)
-                            ) + fadeOut(animationSpec = tween(300))
-                        },
-                        popEnterTransition = {
-                            slideIntoContainer(
-                                towards = AnimatedContentTransitionScope.SlideDirection.Right,
-                                animationSpec = tween(300)
-                            ) + fadeIn(animationSpec = tween(300))
-                        },
-                        popExitTransition = {
-                            slideOutOfContainer(
-                                towards = AnimatedContentTransitionScope.SlideDirection.Right,
-                                animationSpec = tween(300)
-                            ) + fadeOut(animationSpec = tween(300))
-                        }
-                    ) {
-                        composable<SignUp>() {
-                            SignUpScreen(navController)
-                        }
-                        composable<AuthScreen> {
-                            AuthScreen(navController)
-                        }
-                        composable<Login> (
+                    SharedTransitionLayout {
+                        NavHost(
+                            navController = navController,
+                            startDestination = if (session.getToken() != null) Home else AuthScreen,
+                            modifier = Modifier.padding(innerPadding),
                             enterTransition = {
                                 slideIntoContainer(
-                                    towards = AnimatedContentTransitionScope.SlideDirection.Up,
+                                    towards = AnimatedContentTransitionScope.SlideDirection.Left,
                                     animationSpec = tween(300)
                                 ) + fadeIn(animationSpec = tween(300))
                             },
                             exitTransition = {
                                 slideOutOfContainer(
-                                    towards = AnimatedContentTransitionScope.SlideDirection.Up,
+                                    towards = AnimatedContentTransitionScope.SlideDirection.Left,
                                     animationSpec = tween(300)
                                 ) + fadeOut(animationSpec = tween(300))
                             },
                             popEnterTransition = {
                                 slideIntoContainer(
-                                    towards = AnimatedContentTransitionScope.SlideDirection.Down,
+                                    towards = AnimatedContentTransitionScope.SlideDirection.Right,
                                     animationSpec = tween(300)
                                 ) + fadeIn(animationSpec = tween(300))
                             },
                             popExitTransition = {
                                 slideOutOfContainer(
-                                    towards = AnimatedContentTransitionScope.SlideDirection.Down,
+                                    towards = AnimatedContentTransitionScope.SlideDirection.Right,
                                     animationSpec = tween(300)
                                 ) + fadeOut(animationSpec = tween(300))
                             }
                         ) {
-                            SignInScreen(navController)
-                        }
-                        composable<Home> {
-                            Box(modifier = Modifier
-                                .fillMaxSize()
-                                .background(Color.Red)) {
-
+                            composable<SignUp>() {
+                                SignUpScreen(navController)
+                            }
+                            composable<AuthScreen> {
+                                AuthScreen(navController)
+                            }
+                            composable<Login> (
+                                enterTransition = {
+                                    slideIntoContainer(
+                                        towards = AnimatedContentTransitionScope.SlideDirection.Up,
+                                        animationSpec = tween(300)
+                                    ) + fadeIn(animationSpec = tween(300))
+                                },
+                                exitTransition = {
+                                    slideOutOfContainer(
+                                        towards = AnimatedContentTransitionScope.SlideDirection.Up,
+                                        animationSpec = tween(300)
+                                    ) + fadeOut(animationSpec = tween(300))
+                                },
+                                popEnterTransition = {
+                                    slideIntoContainer(
+                                        towards = AnimatedContentTransitionScope.SlideDirection.Down,
+                                        animationSpec = tween(300)
+                                    ) + fadeIn(animationSpec = tween(300))
+                                },
+                                popExitTransition = {
+                                    slideOutOfContainer(
+                                        towards = AnimatedContentTransitionScope.SlideDirection.Down,
+                                        animationSpec = tween(300)
+                                    ) + fadeOut(animationSpec = tween(300))
+                                }
+                            ) {
+                                SignInScreen(navController)
+                            }
+                            composable<Home> {
+                                HomeScreen(navController,this)
+                            }
+                            composable<RestaurantDetails> {
+                                val route = it.toRoute<RestaurantDetails>()
+                                RestaurantDetailsScreen(navController,
+                                    name = route.restaurantName,
+                                    imageUrl = route.restaurantImageUrl,
+                                    restaurantId = route.restaurantId,
+                                    this
+                                )
                             }
                         }
                     }
